@@ -21,6 +21,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -30,6 +33,13 @@ android {
             matchingFallbacks = ['release']
             proguardFiles 'benchmark-rules.pro'
             debuggable false
+        }
+    }
+    flavorDimensions 'default'
+    productFlavors {
+        develop {
+        }
+        product {
         }
     }
     compileOptions {
