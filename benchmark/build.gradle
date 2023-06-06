@@ -10,19 +10,20 @@ android {
     compileSdk 33
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        jvmToolchain(17)
     }
 
     defaultConfig {
-        minSdk 25
+        minSdk 28
         targetSdk 33
         missingDimensionStrategy "default", "product"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunnerArguments["androidx.benchmark.enabledRules"] = "BaselineProfile"
     }
 
     buildTypes {
@@ -35,15 +36,10 @@ android {
             matchingFallbacks = ["debug"]
         }
     }
-    flavorDimensions 'default'
+    flavorDimensions += ["default"]
     productFlavors {
-        develop {
-//            dimension 'default'
-        }
-
-        product {
-//            dimension 'default'
-        }
+        develop { dimension = "default" }
+        product { dimension = "default" }
     }
 
     targetProjectPath = ":app"
@@ -51,8 +47,14 @@ android {
     testOptions {
         managedDevices {
             devices {
-                pixel6Api31(ManagedVirtualDevice) {
-                    device = "Pixel 6"
+                // なるべく本番に近いビルドを試す必要があるが、現状そこまでbaseline-profile.txtに差が出るとは思えないのでdevelopBenchmarkを指定。developBenchmarkは難読化されたdevelopDebugという位置付け。
+                // $ ./gradlew :benchmark:pixel6ProApi31DevelopBenchmarkAndroidTest -P android.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules=BaselineProfile
+                // 出力先フォルダ:
+                // benchmark/build/outputs/managed_device_android_test_additional_output/flavors/develop/pixel6ProApi31/
+                // or benchmark/build/intermediates/managed_device_android_test_additional_output/developBenchmark/pixel6ProApi31UncheckedStagingBenchmarkAndroidTest/
+                // develop
+                pixel6ProApi31(ManagedVirtualDevice) {
+                    device = "Pixel 6 Pro" // Pixel 6はダメだった（2023/05/18）
                     apiLevel = 31
                     systemImageSource = "aosp"
                 }
@@ -65,7 +67,7 @@ dependencies {
     implementation 'androidx.test.ext:junit:1.1.5'
     implementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-    implementation 'androidx.benchmark:benchmark-macro-junit4:1.1.1'
+    implementation 'androidx.benchmark:benchmark-macro-junit4:1.2.0-alpha14'
 }
 
 androidComponents {
